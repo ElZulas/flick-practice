@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aim Trainer</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212;
+            margin: 0;
+            color: #ffffff;
+            position: relative;
+        }
+        #login, #menu, #game {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: none;
+            text-align: center;
+        }
+        input, button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border 0.3s ease;
+        }
+        @keyframes rgb-border {
+            0% {
+                border-color: rgb(255, 0, 0);
+            }
+            33% {
+                border-color: rgb(0, 255, 0);
+            }
+            66% {
+                border-color: rgb(0, 0, 255);
+            }
+            100% {
+                border-color: rgb(255, 0, 0);
+            }
+        }
+        button:hover {
+            border: 2px solid;
+            animation: rgb-border 1s infinite;
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+        .target {
+            width: 100%;
+            height: 100%;
+            background-color: red;
+            border-radius: 50%;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        @media (max-width: 768px) {
+            #grid {
+                grid-template-columns: repeat(3, 80px);
+                grid-template-rows: repeat(3, 80px);
+            }
+            .target {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        .light-mode {
+            background-color: #f0f0f0;
+            color: #000000;
+        }
+        .light-mode #login, .light-mode #menu, .light-mode #game {
+            background: #ffffff;
+        }
+        #toggleModeButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .mode-button-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .mode-description {
+            position: absolute;
+            left: 0;
+            top: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            width: 200px;
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .mode-button-container:hover .mode-description {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div id="login">
+        <h2>Iniciar Sesión</h2>
+        <input type="text" id="username" placeholder="Usuario" required>
+        <input type="password" id="password" placeholder="Contraseña" required>
+        <button id="loginButton">Iniciar sesión</button>
+    </div>
+    <div id="menu">
+        <h2>Menú Principal</h2>
+        <button id="playButton">Jugar</button>
+        <button id="scoreboardButton">Scoreboard</button>
+        <button id="logoutButton">Cerrar Sesión</button>
+        <button id="viewUsersButton">Ver Usuarios</button>
+    </div>
+    <div id="game">
+        <h2>Juego de Puntería</h2>
+        <div id="grid"></div>
+        <p>Puntuación: <span id="score">0</span></p>
+        <p>Tiempo: <span id="time">60</span>s</p>
+    </div>
+    <div id="scoreboard" style="display: none;">
+        <h2>Scoreboard</h2>
+        <div id="scoreboardContent"></div>
+        <button id="backButton">Volver</button>
+    </div>
+    <div id="connectedUsers" style="display: none;">
+        <h2>Usuarios Conectados Recientemente</h2>
+        <div id="connectedUsersContent"></div>
+        <button id="backFromUsersButton">Volver</button>
+    </div>
+    <div id="gameModes" style="display: none;">
+        <h2>Selecciona el Modo de Juego</h2>
+        <div class="mode-button-container">
+            <button id="mode10s">10 Segundos</button>
+            <div class="mode-description">Juego de 10 segundos. Intenta obtener la mayor puntuación posible en este tiempo limitado.</div>
+        </div>
+        <div class="mode-button-container">
+            <button id="mode30s">30 Segundos</button>
+            <div class="mode-description">Juego de 30 segundos. Un desafío más largo para probar tus habilidades.</div>
+        </div>
+        <div class="mode-button-container">
+            <button id="mode60s">60 Segundos</button>
+            <div class="mode-description">Juego de 60 segundos. El modo estándar para una experiencia completa.</div>
+        </div>
+        <div class="mode-button-container">
+            <button id="modeOneShot">One Shot One Kill</button>
+            <div class="mode-description">Modo infinito. Un solo error y pierdes. ¿Cuánto puedes durar?</div>
+        </div>
+        <button id="backFromModesButton">Volver</button>
+    </div>
+    <div id="scoreboardModes" style="display: none;">
+        <h2>Selecciona el Modo de Juego para Ver el Marcador</h2>
+        <button id="scoreMode10s">10 Segundos</button>
+        <button id="scoreMode30s">30 Segundos</button>
+        <button id="scoreMode60s">60 Segundos</button>
+        <button id="scoreModeOneShot">One Shot One Kill</button>
+        <button id="backFromScoreModesButton">Volver</button>
+    </div>
+    <button id="toggleModeButton">Cambiar Modo</button>
+    <script src="app.js"></script>
+</body>
+</html> 

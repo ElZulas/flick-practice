@@ -1,0 +1,33 @@
+.mode-button-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.mode-description {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 200px;
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.mode-button-container:hover .mode-description {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+button {
+    border: 2px solid transparent;
+    transition: border 0.3s ease;
+}
+
+button:hover {
+    border: 2px solid rgb(0, 255, 255);
+} 
